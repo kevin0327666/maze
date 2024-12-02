@@ -1,37 +1,47 @@
-# DAG可视化管理系统
+# 迷宫生成器
 
-这是一个基于Flask的DAG（有向无环图）可视化和管理系统，允许用户通过Web界面创建、编辑和管理DAG图。
+这是一个基于 Flask 的在线迷宫生成器，可以生成随机的迷宫并提供可视化界面。
 
 ## 功能特点
 
-- 可视化DAG图的创建和编辑
-- 实时环检测，防止创建循环依赖
-- RESTful API支持
-- 支持边的添加和删除
-- 直观的Web界面
+- 支持自定义迷宫大小（5x5 到 50x50）
+- 支持自定义单元格大小（10-40像素）
+- 使用深度优先搜索（DFS）算法生成迷宫
+- 清晰标识起点（绿色）和终点（红色）
+- 实时生成和显示
+- 响应式界面设计
 
 ## 技术栈
 
 - 后端：Python Flask
-- 前端：HTML, JavaScript
-- API：RESTful
+- 前端：HTML5, JavaScript
+- 可视化：Canvas
 
 ## 安装说明
 
 1. 克隆项目到本地：
 ```bash
-git clone [your-repository-url]
-cd [repository-name]
+git clone https://github.com/kevin0327666/maze.git
+cd maze
 ```
 
-2. 安装依赖：
+2. 创建并激活虚拟环境（可选）：
+```bash
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# Linux/Mac
+source .venv/bin/activate
+```
+
+3. 安装依赖：
 ```bash
 pip install -r requirements.txt
 ```
 
 ## 运行方法
 
-1. 启动Flask服务器：
+1. 启动服务器：
 ```bash
 python main.py
 ```
@@ -41,25 +51,32 @@ python main.py
 http://localhost:5000
 ```
 
-## API接口说明
+## 使用说明
 
-### 获取DAG数据
-- 端点：`GET /api/dag`
-- 返回：当前DAG的节点和边数据
+1. 调整迷宫参数：
+   - 使用"迷宫大小"输入框设置迷宫的网格数（5-50）
+   - 使用"单元格大小"输入框设置每个单元格的像素大小（10-40）
 
-### 更新DAG数据
-- 端点：`POST /api/dag`
-- 功能：更新整个DAG图
-- 请求体：包含nodes和edges的JSON数据
-- 说明：会自动进行环检测，如存在环则返回错误
+2. 生成迷宫：
+   - 点击"生成新迷宫"按钮生成新的迷宫
+   - 每次修改参数后会自动重新生成迷宫
 
-### 删除边
-- 端点：`DELETE /api/dag/edge`
-- 功能：删除指定的边
-- ��求体：包含source和target的JSON数据
+3. 迷宫说明：
+   - 绿色方块：起点
+   - 红色方块：终点
+   - 黑色方块：墙
+   - 白色方块：通道
 
 ## 注意事项
 
-- 系统会自动检测并防止创建带有环的图
-- 所有的更改都会实时保存
-- 运行时请确保5000端口未被占用 
+- 建议使用现代浏览器（Chrome、Firefox、Edge等）访问
+- 迷宫大小会影响生成速度，较大的迷宫可能需要更多时间生成
+- 确保 5000 端口未被其他程序占用
+
+## 开发者
+
+- Kevin
+
+## 许可证
+
+MIT License
