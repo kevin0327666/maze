@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迷宫生成器</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #maze-container {
+            display: inline-block;
+            margin: 20px;
+        }
+        
+        canvas {
+            border: 2px solid #333;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .legend {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #333;
+        }
+
+        .config-panel {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        label {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>迷宫生成器</h1>
+        <div class="config-panel">
+            <div class="config-item">
+                <label for="mazeSize">迷宫大小:</label>
+                <input type="number" id="mazeSize" min="5" max="50" value="25" />
+            </div>
+            <div class="config-item">
+                <label for="cellSize">单元格大小:</label>
+                <input type="number" id="cellSize" min="10" max="40" value="20" />
+            </div>
+        </div>
+        <button onclick="generateMaze()">生成新迷宫</button>
+        <div id="maze-container">
+            <canvas id="mazeCanvas" width="500" height="500"></canvas>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #4CAF50;"></div>
+                <span>起点</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: #f44336;"></div>
+                <span>终点</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mazeCanvas');
+        const ctx = canvas.getContext('2d');
+        let cellSize = 20; // 每个单元格的大小
+
+        function updateCanvasSize() {
+            const size = parseInt(document.getElementById('mazeSize').value);
+            cellSize = parseInt(document.getElementById('cellSize').value);
+            const canvasSize = size * cellSize;
+            canvas.width = canvasSize;
+            canvas.height = canvasSize;
+        }
+
+        function drawMaze(mazeData) {
+            const maze = mazeData.maze;
+            const start = mazeData.start;
+            const end = mazeData.end;
+            
+            updateCanvasSize();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制迷宫
+            for (let y = 0; y < maze.length; y++) {
+                for (let x = 0; x < maze[y].length; x++) {
+                    if (maze[y][x] === 1) {
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    } else {
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // 绘制起点（绿色）
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(start[0] * cellSize, start[1] * cellSize, cellSize, cellSize);
+            
+            // 绘制终点（红色）
+            ctx.fillStyle = '#f44336';
+            ctx.fillRect(end[0] * cellSize, end[1] * cellSize, cellSize, cellSize);
+        }
+
+        async function generateMaze() {
+            try {
+                const size = parseInt(document.getElementById('mazeSize').value);
+                const response = await fetch('/api/generate_maze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ size: size })
+                });
+                
+                const data = await response.json();
+                drawMaze(data);
+            } catch (error) {
+                console.error('生成迷宫时出错:', error);
+            }
+        }
+
+        // 监听输入变化
+        document.getElementById('mazeSize').addEventListener('change', function() {
+            if (this.value < 5) this.value = 5;
+            if (this.value > 50) this.value = 50;
+            generateMaze();
+        });
+
+        document.getElementById('cellSize').addEventListener('change', function() {
+            if (this.value < 10) this.value = 10;
+            if (this.value > 40) this.value = 40;
+            generateMaze();
+        });
+
+        // 页面加载时生成第一个迷宫
+        generateMaze();
+    </script>
+</body>
+</html> 
